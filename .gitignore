@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+server/node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Environment
+.env
+.env.development
+.env.test
+.env.production
+server/.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor/OS
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+
+# Firebase (if any remain)
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*

@@ -1,0 +1,57 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import Remedies from './pages/Remedies';
+import DoshaTest from './pages/DoshaTest';
+import Chat from './pages/Chat';
+import Community from './pages/Community';
+import DietPlan from './pages/DietPlan';
+import Therapy from './pages/Therapy';
+import Appointments from './pages/Appointments';
+import SessionCenters from './pages/SessionCenters';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <main className="page">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/remedies" element={<Remedies />} />
+            <Route path="/dosha-test" element={<DoshaTest />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/therapy" element={<Therapy />} />
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/centers" element={<SessionCenters />} />
+            
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/diet-plan" element={
+              <ProtectedRoute>
+                <DietPlan />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </main>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
