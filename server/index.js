@@ -12,7 +12,18 @@ const app = express();
 
 // CORS — allow frontend origin
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'http://localhost:5176',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5175',
+    'http://127.0.0.1:5176',
+    'http://127.0.0.1:3000'
+  ],
   credentials: true,
 }));
 
@@ -25,13 +36,24 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/herbs', herbRoutes);
 
+// Middleware to check database connection status
+app.use((req, res, next) => {
+  if (mongoose.connection.readyState !== 1 && req.path.startsWith('/api')) {
+    console.log(`⚠️ Request to ${req.path} blocked: Database state is ${mongoose.connection.readyState}`);
+    return res.status(503).json({ 
+      message: 'Database connection not established. Please check your MongoDB Atlas IP whitelist or connection string.' 
+    });
+  }
+  next();
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // 404 handler for unknown API routes
-app.use('/api/{*path}', (req, res) => {
+app.use('/api', (req, res) => {
   res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });
 
@@ -43,18 +65,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Connect to MongoDB and start server
+// Connect to MongoDB
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/ayursutra';
 
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1);
+    console.warn('⚠️ Server is running but features requiring database will fail.');
   });
+
+// Start server independently of DB connection to avoid "Failed to fetch"
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📡 API endpoints at http://localhost:${PORT}/api`);
+  console.log('💡 TIP: If you see "Failed to fetch" in the frontend, ensure this terminal stays open!');
+  console.log('🔌 Health check: http://localhost:5000/api/health');
+});

@@ -57,8 +57,24 @@ function getOrCreateChat(history = []) {
 export async function getAyurvedicResponse(userMessage, chatHistory = []) {
   try {
     const chat = getOrCreateChat(chatHistory);
-    const result = await chat.sendMessage(userMessage);
-    return result.response.text();
+    
+    // Simple retry logic for transient 503/errors
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const result = await chat.sendMessage(userMessage);
+        return result.response.text();
+      } catch (error) {
+        lastError = error;
+        if (error.message?.includes("503") || error.message?.includes("Service Unavailable")) {
+          console.warn(`Gemini API attempt ${attempt} failed (503). Retrying...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential-ish backoff
+          continue;
+        }
+        throw error; // Re-throw if not a retryable error
+      }
+    }
+    throw lastError;
   } catch (error) {
     console.error("Gemini API error:", error);
 
