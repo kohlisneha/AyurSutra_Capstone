@@ -142,40 +142,41 @@ export function hasToken() {
 // ─── Users ─────────────────────────────────────────────────
 
 export async function apiSaveDosha(dosha, doshaScores) {
-  const users = getMockUsers();
-  const token = getToken();
-  const userId = token.replace('mock-jwt-token-', '');
-  const userIdx = users.findIndex(u => u.id === userId);
-  
-  if (userIdx !== -1) {
-    users[userIdx].dosha = dosha;
-    users[userIdx].doshaScores = doshaScores;
-    localStorage.setItem('ayursutra_mock_users', JSON.stringify(users));
-  }
-
-  return { status: 'ok' };
+  return request('/api/users/dosha', {
+    method: 'PUT',
+    body: JSON.stringify({ dosha, doshaScores }),
+  });
 }
 
 // ─── Posts ──────────────────────────────────────────────────
 
 export async function apiGetPosts() {
-  return { posts: [] };
+  return request('/api/posts');
 }
 
 export async function apiCreatePost(content) {
-  return { status: 'ok' };
+  return request('/api/posts', {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
 }
 
 export async function apiToggleLike(postId) {
-  return { status: 'ok' };
+  return request(`/api/posts/${postId}/like`, {
+    method: 'PUT',
+  });
 }
 
 // ─── Herbs ─────────────────────────────────────────────────
 
 export async function apiGetHerbs() {
-  return { herbs: [] };
+  return request('/api/herbs');
 }
 
 export async function apiSeedHerbs() {
-  return { status: 'ok' };
+  return request('/api/herbs/seed', { method: 'POST' });
+}
+
+export async function apiResetHerbs() {
+  return request('/api/herbs/reset', { method: 'POST' });
 }

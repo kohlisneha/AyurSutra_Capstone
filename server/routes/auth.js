@@ -9,36 +9,50 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    console.log('Register request received:', { name, email });
+
     // Validation
     if (!name || !email || !password) {
+      console.log('Validation failed: missing fields');
       return res.status(400).json({ message: 'Please provide name, email, and password' });
     }
 
     if (password.length < 6) {
+      console.log('Validation failed: password too short');
       return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
     // Check if user already exists
+    console.log('Checking for existing user...');
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists');
       return res.status(400).json({ message: 'An account with this email already exists' });
     }
 
     // Create user
+    console.log('Creating new user...');
     const user = await User.create({
       name,
       email,
       password,
     });
+    console.log('User created successfully:', user._id);
 
     // Generate token
+    console.log('Generating token...');
     const token = generateToken(user._id);
+    console.log('Token generated');
+
+    const userData = user.toJSON();
+    console.log('User data prepared for response');
 
     res.status(201).json({
       token,
-      user: user.toJSON(),
+      user: userData,
     });
   } catch (error) {
+    console.error('Register error DETECTED:', error);
     if (error.code === 11000) {
       return res.status(400).json({ message: 'An account with this email already exists' });
     }
@@ -46,8 +60,7 @@ router.post('/register', async (req, res) => {
       const messages = Object.values(error.errors).map(e => e.message);
       return res.status(400).json({ message: messages.join('. ') });
     }
-    console.error('Register error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server error during registration: ' + error.message });
   }
 });
 

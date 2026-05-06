@@ -5,7 +5,7 @@ const centers = [
   {
     id: 1,
     name: 'AyurSutra Wellness Center - Mumbai',
-    image: '/ayurvedic_center_lobby_1773497604306.png',
+    image: '/images/centers/mumbai.jpg',
     address: '102, Heritage Building, Bandra West, Mumbai, MH 400050',
     phone: '+91 22 4567 8901',
     email: 'mumbai@ayursutra.com',
@@ -17,7 +17,7 @@ const centers = [
   {
     id: 2,
     name: 'Heritage Healing Hub - Rishikesh',
-    image: '/ayurvedic_treatment_room_1773497629545.png',
+    image: '/images/centers/rishikesh.jpg',
     address: 'Laxman Jhula Road, Near Ganga Bank, Rishikesh, UK 249001',
     phone: '+91 135 244 5566',
     email: 'rishikesh@ayursutra.com',
@@ -55,7 +55,7 @@ const SessionCenters = () => {
           <div key={center.id} className="card" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '0', padding: 0, overflow: 'hidden' }}>
             <div style={{ position: 'relative', height: '100%', minHeight: '300px' }}>
               <img 
-                src={center.image} 
+                src={`${center.image}?v=1`} 
                 alt={center.name} 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -111,13 +111,19 @@ const SessionCenters = () => {
                 </div>
               </div>
 
-              <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', display: 'flex', gap: '1.5rem' }}>
-                <a href="#" style={{ color: 'var(--primary-color)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  View on Map <ExternalLink size={14} />
+              <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(center.name + ' ' + center.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--primary-color)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.95rem' }}
+                >
+                  <MapPin size={16} /> Get Directions 
                 </a>
-                <a href="#" style={{ color: 'var(--primary-color)', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  Full Details <ExternalLink size={14} />
-                </a>
+                <span style={{ fontSize: '0.85rem', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '600' }}>
+                  <div style={{ width: '8px', height: '8px', backgroundColor: 'var(--success-color)', borderRadius: '50%' }}></div>
+                  Currently Open
+                </span>
               </div>
             </div>
           </div>

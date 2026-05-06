@@ -26,7 +26,10 @@ const Appointments = () => {
     session: '',
     date: '',
     time: '',
-    issue: ''
+    issue: '',
+    email: currentUser?.email || '',
+    phone: '',
+    notifyMethod: 'both' // 'email', 'sms', or 'both'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -41,7 +44,7 @@ const Appointments = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
+    // Simulate API call and notification sending
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -53,17 +56,28 @@ const Appointments = () => {
       <div className="container page" style={{ maxWidth: '600px', textAlign: 'center', paddingTop: '5rem' }}>
         <div className="card" style={{ padding: '4rem 2rem' }}>
           <CheckCircle size={80} color="var(--success-color)" style={{ marginBottom: '2rem' }} />
-          <h1 style={{ color: 'var(--primary-dark)', marginBottom: '1rem' }}>Appointment Confirmed!</h1>
+          <h1 style={{ color: 'var(--primary-dark)', marginBottom: '1rem' }}>Booking Confirmed!</h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.2rem' }}>
             Namaste {currentUser?.displayName || 'User'}. Your session for <strong>{formData.session}</strong> at <strong>{formData.center}</strong> has been scheduled successfully.
           </p>
-          <div style={{ backgroundColor: '#f0f9f1', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', textAlign: 'left' }}>
-            <p><strong>Date:</strong> {formData.date}</p>
-            <p><strong>Time:</strong> {formData.time}</p>
-            <p><strong>Location:</strong> {formData.center}</p>
+          
+          <div style={{ 
+            backgroundColor: 'rgba(76, 175, 80, 0.05)', 
+            padding: '1.5rem', 
+            borderRadius: 'var(--radius-md)', 
+            marginBottom: '2.5rem', 
+            textAlign: 'left',
+            border: '1px solid rgba(76, 175, 80, 0.2)'
+          }}>
+            <h4 style={{ color: 'var(--primary-dark)', marginBottom: '1rem' }}>Confirmation Sent</h4>
+            <p style={{ fontSize: '0.95rem', margin: '0.25rem 0' }}>✅ Email sent to: <strong>{formData.email}</strong></p>
+            {formData.phone && <p style={{ fontSize: '0.95rem', margin: '0.25rem 0' }}>✅ SMS sent to: <strong>{formData.phone}</strong></p>}
+            <hr style={{ margin: '1rem 0', border: '0.5px solid var(--border-color)' }} />
+            <p style={{ fontSize: '0.9rem' }}><strong>Appointment:</strong> {formData.date} at {formData.time}</p>
           </div>
+
           <button onClick={() => window.location.href = '/dashboard'} className="btn btn-primary" style={{ width: '100%' }}>
-            Go to Dashboard
+            View My Appointments
           </button>
         </div>
       </div>
@@ -191,22 +205,47 @@ const Appointments = () => {
           {step === 3 && (
             <div className="animate-in">
               <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <User size={24} color="var(--primary-color)" /> Additional Information
+                <User size={24} color="var(--primary-color)" /> Contact Information
               </h2>
               
+              <div className="grid-2" style={{ gap: '1rem' }}>
+                <div className="form-group">
+                  <label>Email Address</label>
+                  <input 
+                    type="email" 
+                    className="input-field" 
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <input 
+                    type="tel" 
+                    className="input-field" 
+                    placeholder="+91 98765 43210"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
                 <label>Briefly describe your health issue (Optional)</label>
                 <textarea 
                   className="input-field" 
-                  rows="4" 
+                  rows="3" 
                   placeholder="E.g. Persistent back pain, stress, digestive issues..."
                   value={formData.issue}
                   onChange={(e) => handleInputChange('issue', e.target.value)}
                 ></textarea>
               </div>
 
-              <div style={{ backgroundColor: '#f9f9f9', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem' }}>
-                <h4 style={{ marginBottom: '1rem' }}>Booking Summary:</h4>
+              <div style={{ backgroundColor: '#f9f9f9', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', borderLeft: '4px solid var(--primary-color)' }}>
+                <h4 style={{ marginBottom: '1rem', color: 'var(--primary-dark)' }}>Booking Summary:</h4>
                 <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                   <p><strong>Center:</strong> {formData.center}</p>
                   <p><strong>Session:</strong> {formData.session}</p>
@@ -216,8 +255,8 @@ const Appointments = () => {
 
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={prevStep}>Back</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={isSubmitting}>
-                  {isSubmitting ? 'Confirming...' : 'Confirm Appointment'}
+                <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={isSubmitting || !formData.email || !formData.phone}>
+                  {isSubmitting ? 'Sending Confirmation...' : 'Confirm & Send Notification'}
                 </button>
               </div>
             </div>

@@ -17,9 +17,12 @@ const Signup = () => {
     setError('');
     setIsLoading(true);
     try {
+      console.log('Attempting signup for:', email);
       await register(name, email, password);
+      console.log('Signup successful, navigating...');
       navigate('/dashboard');
     } catch (err) {
+      console.error('Frontend Signup Error:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);
